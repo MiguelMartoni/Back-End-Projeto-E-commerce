@@ -1,5 +1,4 @@
 package com.miguelmartoni.aula01.controller;
-
 import com.miguelmartoni.aula01.model.Produto;
 import com.miguelmartoni.aula01.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +15,10 @@ public class produtoController {
     private ProdutoRepository repository;
 
     @GetMapping
-    public List<Produto> get(@RequestParam(defaultValue = "nome") String sortField,
-                             @RequestParam(defaultValue = "asc") String sortDirection,
-                             @RequestParam(defaultValue = "false")boolean sortByPrice) {
+    public List<Produto> get(@RequestParam(required = false, defaultValue = "nome") String sortField,
+                             @RequestParam(required = false, defaultValue = "asc") String sortDirection,
+                             @RequestParam(required = false) boolean sortByPrice,
+                             @RequestParam(required = false) String filter)   {
 
         if (sortByPrice) {
             sortField = "preco";
@@ -33,7 +33,11 @@ public class produtoController {
 
         Sort sort = Sort.by(direction, sortField);
 
+        if (filter == null || filter.isEmpty())
         return repository.findAll(sort);
+
+        else
+            return repository.findByNomeContaining(filter, sort);
     }
 
     @PostMapping
